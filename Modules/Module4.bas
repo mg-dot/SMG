@@ -13,40 +13,39 @@ Sub simulation()
     StartTime = Timer
     
 'Vars const
-    Const max_spin As Long = 100         'Liczba spinów w symulacji
-    Const max_stop As Integer = 30
+    Const max_spin As Long = 10000         'Liczba spinów w symulacji
+    Const max_stop As Integer = 35
     Const symbols_number As Integer = 8 'Liczba symboli
     Const reels_number As Integer = 5 'Liczba Reeli
+    Const bet As Integer = 100
     
 'Vars
     Dim reels() As Variant
     Dim paytable() As Variant
-    Dim reel_stops() As Variant
+    Dim reel_stops(1 To reels_number) As Variant
     
-    'Dim randGen_table(1 To reels_number, 1 To max_spin) As Variant
-    
-    
-    Dim randGen1(), randGen2(), randGen3(), randGen4(), randGen5() As Variant
+
+    Dim randGen1(1 To max_spin), randGen2(1 To max_spin), randGen3(1 To max_spin), randGen4(1 To max_spin), randGen5(1 To max_spin) As Variant
     
     Dim screen(1 To 3, 1 To reels_number) As Variant
     Dim symbols(1 To symbols_number) As String
     
     Dim hits(1 To symbols_number, 1 To 3) As Long    ' Output
-    Dim balance(1 To max_spin) As Long               ' Output
-    Dim wins(1 To max_spin) As Long                  ' Output
+    Dim balance(0 To max_spin + 1) As Long             ' Output
+    Dim wins(0 To max_spin + 1) As Long                ' Output
     
-    balance(1) = 0
-    wins(1) = 0
+    balance(0) = 0
+    wins(0) = 0
     
-    Call CopyStopsinReels(reel_stops)
+    Call CalcMaxStopsOnReel(reel_stops)
     Call CopyReels(reels, max_stop)     ' Kopiowanie Reelsów
     Call CopyPayTable(paytable)         ' Kopiowanie PayTable
 
-   ' Call Generator(randGen1(), max_spin, reel_stops(1))  ' Losowanie max liczb i zapisanie do tablicy RandGen()
-   ' Call Generator(randGen2(), max_spin, reel_stops(2))
-   ' Call Generator(randGen3(), max_spin, reel_stops(3))
-   ' Call Generator(randGen4(), max_spin, reel_stops(4))
-   ' Call Generator(randGen5(), max_spin, reel_stops(5))
+    Call Generator(randGen1(), max_spin, reel_stops(1))  ' Losowanie max liczb i zapisanie do tablicy RandGen()
+    Call Generator(randGen2(), max_spin, reel_stops(2))
+    Call Generator(randGen3(), max_spin, reel_stops(3))
+    Call Generator(randGen4(), max_spin, reel_stops(4))
+    Call Generator(randGen5(), max_spin, reel_stops(5))
 
     
    
@@ -69,16 +68,22 @@ Sub simulation()
     
     For i = 1 To max_spin
         
-        balance(i) = balance(i - 1) - 100 ' Ka¿dy spin = -100 na balance
+        balance(i) = balance(i - 1) - bet ' Ka¿dy spin = -100 na balance
+        
+        k1(1) = randGen1(i)
+        k1(2) = randGen2(i)
+        k1(3) = randGen3(i)
+        k1(4) = randGen4(i)
+        k1(5) = randGen5(i)
         
         ' Wybieramy i-ta wylosowana liczbe
         For j = 1 To 5
-            k1(j) = randGen1(j)
             
-            If k1(j) = max_stop - 1 Then
-                k2(j) = max_stop
+            
+            If k1(j) = reel_stops(j) - 1 Then
+                k2(j) = reel_stops(j)
                 k3(j) = 1
-            ElseIf k1(j) = max_stop Then
+            ElseIf k1(j) = reel_stops(j) Then
                 k2(j) = 1
                 k3(j) = 2
             Else
@@ -89,9 +94,9 @@ Sub simulation()
         ' Ustawiamy Screen 3x5
         
         For k = 1 To 5
-                screen(1, k) = reels(k1(j), k)
-                screen(2, k) = reels(k2(j), k)
-                screen(3, k) = reels(k3(j), k)
+                screen(1, k) = reels(k1(k), k)
+                screen(2, k) = reels(k2(k), k)
+                screen(3, k) = reels(k3(k), k)
         Next k
                 
         For l = 1 To 8
@@ -268,7 +273,7 @@ Sub simulation()
                 
             Next l
         
-        If balance(i) = balance(i - 1) - 100 Then
+        If balance(i) = balance(i - 1) - bet Then
             wins(i) = wins(i - 1)
         Else: wins(i) = wins(i - 1) + 1
         End If
@@ -290,6 +295,7 @@ Sub simulation()
     ToWsh.Range("H5:H" & max_spin + 3) = Application.Transpose(wins())
     ToWsh.Range("V37") = max_spin
     ToWsh.Range("V38") = balance(max_spin)
+    ToWsh.Range("V32") = bet
     ToWsh.Range("V39") = wins(max_spin)
 'Finish
     Dim rtp As Double
