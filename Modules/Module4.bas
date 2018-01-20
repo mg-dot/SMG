@@ -13,11 +13,11 @@ Sub simulation()
     StartTime = Timer
     
 'Vars const
-    Const max_spin As Long = 10000         'Liczba spinów w symulacji
-    Const max_stop As Integer = 35
+    Const max_spin As Long = 100000         'Liczba spinów w symulacji
+    Const max_stop As Integer = 100
     Const symbols_number As Integer = 8 'Liczba symboli
     Const reels_number As Integer = 5 'Liczba Reeli
-    Const bet As Integer = 100
+    Const bet As Integer = 50
     
 'Vars
     Dim reels() As Variant

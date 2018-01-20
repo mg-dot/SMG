@@ -70,3 +70,6 @@ Function CalcMaxStopsOnReel(tab04())
     
 End Function
 
+
+
+
